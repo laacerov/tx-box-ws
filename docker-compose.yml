@@ -1,0 +1,70 @@
+version: '3'
+
+services:
+  kamailio:
+    image: oklabs/kamailio:5.5
+    ports:
+      - "5060:5060/udp"
+    volumes:
+      - ./kamailio:/etc/kamailio
+    environment:
+      - DBHOST=mariadb
+      - DBNAME=kamailio
+      - DBRWUSER=kamailio
+      - DBRWPW="kamailiorw"
+      - DBROUSER="kamailioro"
+      - DBROPW="kamailioro"
+      - DBROOTUSER="root"
+      - RTPENGINE=rtpengine
+      - RTPPROXY_SOCK=/var/run/rtpengine/rtpengine.sock
+      - RTPEXTRAS=--no-log
+    depends_on:
+      - mariadb
+      - phpmyadmin
+      - rtpengine
+
+    command: kamailio -f /etc/kamailio/kamailio.cfg -DD -E
+    networks:
+      - lab-network    
+
+  rtpengine:
+    image: audiocodes/rtpengine:latest
+    privileged: true
+    ports:
+      - "22222:22222/udp"
+      - "22223:22223/tcp"
+    volumes:
+      - ./rtpengine:/etc/rtpengine   
+      - ./rtp-recordings:/rec
+    command: rtpengine --interface=eth0 --listen-ng=127.0.0.1:22222 --listen-tcp=127.0.0.1:22223
+    networks:
+      - lab-network    
+
+  mariadb:
+    image: mariadb:latest
+    volumes:
+      - ./db:/var/lib/mysql
+    ports:
+      - "3306:3306"
+    environment:
+      - MYSQL_ROOT_PASSWORD=rootpw
+      - MYSQL_DATABASE=kamailio
+      - MYSQL_USER=kamailio
+      - MYSQL_PASSWORD=kamailiopw
+    networks:
+      - lab-network
+
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    ports:
+      - "8080:80"
+    environment:
+      - PMA_HOST=mariadb
+    depends_on:
+      - mariadb
+    networks:
+      - lab-network
+
+networks:
+  lab-network:
+    driver: bridge   

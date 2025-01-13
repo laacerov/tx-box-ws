@@ -1,0 +1,17 @@
+#SIP_DOMAIN=sipXX.voztovoice.org
+DBENGINE=MYSQL
+DBHOST=172.18.0.2
+DBNAME=kamailio
+DBRWUSER=kamailio
+DBRWPW="kamailiopw"
+DBROUSER="kamailioro"
+DBROPW="kamailioro"
+DBROOTUSER="root"
+INSTALL_EXTRA_TABLES=ask
+INSTALL_PRESENCE_TABLES=ask
+INSTALL_DBUID_TABLES=ask
+ALIASES_TYPE="DB"
+FIFOPATH="/var/run/kamailio/kamailio_fifo"
+VERIFY_ACL=1
+STORE_PLAINTEXT_PW=0
+PID_FILE=/var/run/kamailio/kamailio.pid
